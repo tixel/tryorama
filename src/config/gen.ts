@@ -15,7 +15,7 @@ const defaultCommonConfig = {
 export const gen = ( commonConfig: T.CommonConfig = {} ): T.ConfigSeed => (
   args: T.ConfigSeedArgs
 ): T.RawConductorConfig => {
-    console.log("commonConfig", commonConfig.network ? commonConfig.network.transport_pool, commonConfig )
+    console.log("commonConfig", commonConfig.network ? commonConfig.network.transport_pool: commonConfig )
   const { configDir, adminInterfacePort, uuid } = args
   const keystorePath = path.join(configDir, 'keystore');
 
