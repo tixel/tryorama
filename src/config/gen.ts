@@ -14,10 +14,11 @@ const defaultCommonConfig = {
 
 export const gen = ( cfg: T.CommonConfig = {} ): T.ConfigSeed => {
     const commonConfig = Object.assign({}, cfg);
+    console.log("commonConfig1", commonConfig.network ? commonConfig.network.transport_pool: commonConfig );
  return   (
   args: T.ConfigSeedArgs
 ): T.RawConductorConfig => {
-    console.log("commonConfig", commonConfig.network ? commonConfig.network.transport_pool: commonConfig )
+    console.log("commonConfig2", commonConfig.network ? commonConfig.network.transport_pool: commonConfig );
   const { configDir, adminInterfacePort, uuid } = args
   const keystorePath = path.join(configDir, 'keystore');
 
