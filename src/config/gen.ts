@@ -12,7 +12,9 @@ const defaultCommonConfig = {
   }
 }
 
-export const gen = ( commonConfig: T.CommonConfig = {} ): T.ConfigSeed => (
+export const gen = ( cfg: T.CommonConfig = {} ): T.ConfigSeed => {
+    const commonConfig = Object.assign({}, cfg);
+ return   (
   args: T.ConfigSeedArgs
 ): T.RawConductorConfig => {
     console.log("commonConfig", commonConfig.network ? commonConfig.network.transport_pool: commonConfig )
@@ -38,6 +40,7 @@ export const gen = ( commonConfig: T.CommonConfig = {} ): T.ConfigSeed => (
   // so this will override defaults with specifically set values
   // https://lodash.com/docs/4.17.15#merge
   return _.merge({}, defaultCommonConfig, specific)
+    }
 }
 
 export const getConfigPath = (configDir: string) =>
