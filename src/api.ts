@@ -127,12 +127,12 @@ export class ScenarioApi {
 
   _createTrycpPlayerBuilder = async (trycpClient: TrycpClient, playerName: string, configSeed: T.ConfigSeed): Promise<PlayerBuilder> => {
       const configJson = this._generateConfigFromSeed({ adminInterfacePort: 0, configDir: "unused" }, playerName, configSeed)
-      console.log("configJson built", configJson.network.transport_pool)
+      console.log("configJson built", configJson.network ? configJson.network.transport_pool : configJson)
     return async () => {
       // FIXME: can we get this from somewhere?
       await trycpClient.configurePlayer(playerName, configJson)
       logger.debug('api.players: player config committed for %s', playerName)
-      console.log("configJson used", configJson.network.transport_pool)
+        console.log("configJson used", configJson.network ? configJson.network.transport_pool : configJson)
       return new Player({
         scenarioUUID: this._uuid,
         name: playerName,
