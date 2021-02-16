@@ -13,9 +13,9 @@ const defaultCommonConfig = {
 }
 
 export const gen = ( cfg: T.CommonConfig = {} ): T.ConfigSeed => {
-    const commonConfig = Object.assign({}, cfg);
+    var commonConfig = Object.assign({}, cfg);
     console.log("commonConfig1", commonConfig.network ? commonConfig.network.transport_pool: commonConfig );
- return   (
+    const seed = (
   args: T.ConfigSeedArgs
 ): T.RawConductorConfig => {
     console.log("commonConfig2", commonConfig.network ? commonConfig.network.transport_pool: commonConfig );
@@ -42,6 +42,7 @@ export const gen = ( cfg: T.CommonConfig = {} ): T.ConfigSeed => {
   // https://lodash.com/docs/4.17.15#merge
   return _.merge({}, defaultCommonConfig, specific)
     }
+    return seed
 }
 
 export const getConfigPath = (configDir: string) =>
