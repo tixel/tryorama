@@ -131,7 +131,10 @@ export const trycpSession = async (machineEndpoint: string): Promise<TrycpClient
 
   const remoteLogLevel = process.env.REMOTE_LOG_LEVEL
 
-  return {
+  const connectAppInterface = (port: number) => makeCall('connect_app_interface')({ port })
+  const disconnectAppInterface = (port: number) => makeCall('disconnect_app_interface')({ port })
+
+  const trycp = {
     saveDna: async (id, contents) => {
       if (!(id in savedDnas)) {
         savedDnas[id] = (async () => makeCall('save_dna')({ id, content: await contents() }))()
@@ -152,9 +155,27 @@ export const trycpSession = async (machineEndpoint: string): Promise<TrycpClient
     kill: (id, signal?) => makeCall('shutdown')({ id, signal }),
     reset: () => makeCall('reset')(undefined),
     adminInterfaceCall: (id, message) => holochainInterfaceCall("admin", { id }, message),
-    appInterfaceCall: (port, message) => holochainInterfaceCall("app", { port }, message),
-    connectAppInterface: (port: number) => makeCall('connect_app_interface')({ port }),
-    disconnectAppInterface: (port: number) => makeCall('disconnect_app_interface')({ port }),
+    appInterfaceCall: async (port, message) => {
+      try {
+        return await holochainInterfaceCall("app", { port }, message)
+      } catch (err) {
+        logger.error(`app interface call error: ${inspect(err)}`)
+        if (String(err).startsWith("Error: trycp error: 'Could not send request: Trying to work with closed connection'")) {
+          logger.debug('Trying to recover from closed app interface through trycp')
+          try {
+            await disconnectAppInterface(port)
+          } catch (err2) {
+            logger.debug(`Failed to disconnect app interface through trycp: ${inspect(err2)}`)
+          }
+          await connectAppInterface(port)
+          return await holochainInterfaceCall("app", { port }, message)
+        } else {
+          throw err
+        }
+      }
+    },
+    connectAppInterface,
+    disconnectAppInterface,
     subscribeAppInterfacePort: (port, onSignal) => {
       signalSubscriptions[port] = onSignal
     },
